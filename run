@@ -1,0 +1,177 @@
+#!/bin/bash
+#
+# Copyright 2015 (c)
+# Gabriel-Andrew Pollo Guilbert
+#
+# This is a simple script that will compile
+# and run a project.
+#
+# SYNTAX
+#
+# To run a project:
+#     ./run [OPTIONS...] <PROJECT'S PATH>
+
+SUCCESS=0
+ERROR=1
+PROJECT=
+MAKECMD=""
+MAKEOPTS=""
+
+BUILD=true
+BUILDALL=false
+EXECUTE=true
+DEBUG=false
+
+DEFAULT_CC="gcc"
+DEFAULT_LD="gcc"
+DEFAULT_DB="valgrind"
+DEFAULT_EXECCMD="exec"
+
+export CC
+export LD
+export LDFLAGS
+export CCFLAGS
+
+function help {
+	echo -e "Usage: ./run [OPTIONS...] <PROJECT'S PATH>"
+	echo -e ""
+	echo -e "Options:"
+	echo -e "\t-r, --run:\t run the binary [default]"
+	echo -e "\t-d, --debug:\t run the binary in debugging"
+	echo -e "\t-b, --build:\t only build the project"
+	echo -e "\t-h, --help:\t show this message"
+	echo -e "\t--buildall:\t build all project"
+	echo -e ""
+	echo -e "Environment variables:"
+	echo -e "\tCC:\tc++ compiler"
+	echo -e "\tLD:\tc++ linker"
+	echo -e "\tDB:\tbinary debugger"
+}
+
+function parse_arg {
+	for ARG in "$@"; do
+		case "$ARG" in
+		"-r" | "--run")
+			BUILD=true
+			BUILDALL=false
+			EXECUTE=true
+			DEBUG=false
+			;;
+		"-d" | "--debug")
+			BUILD=true
+			BUILDALL=false
+			EXECUTE=true
+			DEBUG=true
+			CCFLAGS=-g
+			;;
+		"-b" | "--build")
+			BUILD=true
+			BUILDALL=false
+			EXECUTE=false
+			DEBUG=false
+			;;
+		"--buildall")
+			BUILD=false
+			BUILDALL=true
+			EXECUTE=false
+			DEBUG=false
+			;;
+		"-h" | "--help")
+			help
+			return $ERROR
+			;;
+		*)
+			if [[ $ARG == ${!#} ]]; then
+				PROJECT=${!#}
+			else
+				echo -e "Unrecognized option '$ARG'"
+				echo -e "Try '--help' for more information."
+				return $ERROR
+			fi
+			;;
+		esac
+	done
+
+	return $SUCCESS
+}
+
+function parse_env {
+	if [[ ! -n $CC ]]; then
+		CC=$DEFAULT_CC
+	fi
+
+	if [[ ! -n $LD ]]; then
+		LD=$DEFAULT_LD
+	fi
+
+	if [[ ! -n $DB ]]; then
+		DB=$DEFAULT_DB
+	fi
+
+	if [[ $DEBUG == true ]]; then
+		MAKECMD="debug "
+	elif [[ $EXECUTE == true ]]; then
+		MAKECMD="run "
+	fi
+
+	MAKEOPTS="CC=$CC LD=$LD"
+	MAKECMD+="DB=$DB EXECCMD=$EXECCMD"
+}
+
+function build {
+	make mkdir
+	make clean
+	make $MAKEOPTS
+}
+
+function buildall {
+	DIR=$(pwd)
+
+	find ./ -iname "makefile" | sed 's/makefile//g' | while read FOLDER; do
+        echo -e "\033[36mCompiling..$FOLDER\033[0m"
+		cd "$FOLDER"
+		build
+		echo
+		cd "$DIR"
+	done
+}
+
+function main {
+	parse_arg $@
+	if [[ $? == $ERROR ]]; then
+		return $ERROR
+	fi
+
+	parse_env
+	if [[ $? == $ERROR ]]; then
+		return $ERROR
+	fi
+
+	if [[ $BUILD == true ]]; then
+		if [[ ! -d problems/$PROJECT ]]; then
+			echo -e "ERROR: The specified folder doesn't exist."
+			return $ERROR
+		else
+			cd problems/$PROJECT
+		fi
+
+		if [[ ! -f ./makefile ]]; then
+			echo -e "ERROR: No makefile found."
+			return $ERROR
+		fi
+
+		build
+		if [[ $? == 0 ]]; then
+			if [[ $EXECUTE == true ]]; then
+				make $MAKECMD
+			fi
+		else
+			echo "ERROR: The project didn't compile."
+			exit $ERROR
+		fi
+	elif [[ $BUILDALL == true ]]; then
+		buildall
+	fi
+}
+
+main $@

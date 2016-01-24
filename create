@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+# Copyright 2015 (c)
+# Gabriel-Andrew Pollo Guilbert
+#
+# This is a simple script that creates a project
+# with the base template.
+#
+# SYNTAX
+#
+# To create a project:
+#     ./create [OPTIONS...] <TARGET>
+
+SUCCESS=0
+ERROR=1
+TARGET=
+
+function help {
+	echo -e "Usage: ./create [OPTIONS...] <TARGET>"
+	echo -e ""
+	echo -e "Options:"
+	echo -e "\t-h, --help:\t show this message"
+}
+
+function parse {
+	for ARG in "$@"; do
+		case "$ARG" in
+		"-h" | "--help")
+			help
+			return $ERROR
+			;;
+		*)
+			if [[ $ARG == ${!#} ]]; then
+				TARGET=${!#}
+			else
+				echo -e "Unrecognized option '$ARG'"
+				echo -e "Try '--help' for more information."
+				return $ERROR
+			fi
+			;;
+		esac
+	done
+
+	return $SUCCESS
+}
+
+function main {
+	parse $@
+	if [[ $? == $ERROR ]]; then
+		return $ERROR
+	fi
+
+	if [[ -d $TARGET ]]; then
+		exit $ERROR
+	else
+		mkdir -p problems/$TARGET
+		cp -Rv problems/template/* problems/$TARGET
+	fi
+}
+
+main $@
