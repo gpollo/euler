@@ -15,8 +15,8 @@ int main() {
         if(i % MULT_1 == 0 || i % MULT_2 == 0)
             sum += i;
 
-	printf("The sum of all the multiples of " STR(MULT_1) " or " STR(MULT_2) " below " STR(MAX)
-	       " is %d\n", sum);
+    printf("The sum of all the multiples of " STR(MULT_1) " or " STR(MULT_2) " below " STR(MAX)
+           " is %d\n", sum);
 
     return 0;
 }
