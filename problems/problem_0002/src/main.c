@@ -10,12 +10,9 @@ int main() {
     int n[] = {0, 1, 1};
     int i = 0;
 
-    while(1) {
+    while(n[0] <= MAX || n[1] <= MAX || n[2] <= MAX) {
         if(n[i] % 2 == 0)
             sum += n[i];
-
-        if(n[0] > MAX && n[1] > MAX && n[2] > MAX)
-            break;
 
         switch(i) {
             case 0:
