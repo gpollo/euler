@@ -29,9 +29,9 @@ int main() {
     for(j = Y-2; j >= 0; j--)
         for(i = j; i >= 0; i--)
             if(table[(i+0)+(j+1)*X] > table[(i+1)+(j+1)*X])
-                table[i+(j+0)*X] += table[(i+0)+(j+1)*X];
+                table[i+j*X] += table[(i+0)+(j+1)*X];
             else
-                table[i+(j+0)*X] += table[(i+1)+(j+1)*X];
+                table[i+j*X] += table[(i+1)+(j+1)*X];
 
     printf("The maximum path sum of the triangle is %d.\n", table[0]);
 
