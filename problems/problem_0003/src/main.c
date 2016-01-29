@@ -3,10 +3,10 @@
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 
-#define PRIME 100
+#define PRIME 600851475143
 
 int main() {
-    long dividend = 600851475143;
+    long dividend = PRIME;
     int current = 2;
     int largest = 0;
 
