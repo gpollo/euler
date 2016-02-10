@@ -4,7 +4,7 @@ This repository contains the problems I solved for [project euler](http://projec
 
 Running
 -------
-Each solution can be modified with `#define` at the begging of the source file. A script is provided in order to quickly compile and test a solution. To test a solution inside the `src` folder, the basic syntax is : 
+Each solution can be modified with `#define` at the begging of the source file. A script is provided in order to quickly compile and test a solution. To test a solution inside the `problems` folder, the basic syntax is : 
 ```bash
 $ ./run "folder's name"
 ```
